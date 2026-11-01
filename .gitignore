@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# build output
+backend/target/
+frontend/dist/
+
+# generated SDK (rebuilt by `mise run sdk:gen`)
+frontend/src/api/generated/
+
+# local state
+mise.local.toml
+hk.local.pkl
+
+# editors and OS
+.idea/
+.vscode/
+.DS_Store
+*.log

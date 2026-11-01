@@ -1,0 +1,37 @@
+openapi: 3.0.0
+info:
+  title: Calendar API
+  version: 0.0.0
+tags: []
+paths:
+  /api/health:
+    get:
+      operationId: Api_health
+      summary: Проверка работоспособности сервиса
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/HealthStatus'
+      description: Ответ проверки работоспособности.
+    HealthStatus:
+      type: string
+      enum:
+        - UP
+      description: Состояние сервиса.
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+    variables: {}

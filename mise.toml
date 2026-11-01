@@ -1,0 +1,103 @@
+[settings]
+experimental = true
+
+[tools]
+java = "temurin-21"
+maven = "3.9"
+node = "24"
+gh = "2.103.3"
+hk = "2.11.0"
+pitchfork = "2.33.0"
+
+[env]
+APP_TIMEZONE = "Asia/Almaty"
+
+[hooks]
+postinstall = "mise run install"
+
+[tasks.install]
+description = "Install every project dependency"
+run = [
+  "npm --prefix api ci",
+  "npm --prefix frontend ci",
+  "mvn -B -q -f backend/pom.xml dependency:go-offline",
+]
+
+[tasks."api:gen"]
+description = "Compile TypeSpec and emit OpenAPI"
+run = "npm --prefix api run build:openapi"
+
+[tasks."sdk:gen"]
+description = "Generate the TypeScript SDK from the OpenAPI contract"
+depends = ["api:gen"]
+run = "npm --prefix frontend run sdk:gen"
+
+[tasks."api:lint"]
+description = "Check TypeSpec formatting"
+run = "npm --prefix api run lint"
+
+[tasks."backend:lint"]
+description = "Check Java formatting"
+run = "mvn -B -q -f backend/pom.xml spotless:check"
+
+[tasks."frontend:lint"]
+description = "Lint and format-check the frontend"
+run = "npm --prefix frontend run lint"
+
+[tasks.lint]
+description = "Run every linter"
+depends = ["api:lint", "backend:lint", "frontend:lint"]
+
+[tasks."frontend:typecheck"]
+description = "Type-check the frontend against the generated SDK"
+depends = ["sdk:gen"]
+run = "npm --prefix frontend run typecheck"
+
+[tasks.typecheck]
+description = "Run every type checker"
+depends = ["frontend:typecheck"]
+
+[tasks."backend:test"]
+description = "Run backend tests"
+run = "mvn -B -f backend/pom.xml test"
+
+[tasks.test]
+description = "Run every test suite"
+depends = ["backend:test"]
+
+[tasks.check]
+description = "Run every check used locally and in CI"
+depends = ["lint", "typecheck", "test"]
+
+[tasks.build]
+description = "Build backend and frontend artifacts"
+depends = ["sdk:gen"]
+run = [
+  "mvn -B -q -f backend/pom.xml package -DskipTests",
+  "npm --prefix frontend run build",
+]
+
+[tasks."dev:backend"]
+description = "Run the Spring Boot backend"
+run = "mvn -B -f backend/pom.xml spring-boot:run"
+
+[tasks."dev:frontend"]
+description = "Run the Vite dev server"
+depends = ["sdk:gen"]
+run = "npm --prefix frontend run dev"
+
+[tasks.dev]
+description = "Start backend and frontend daemons"
+alias = "default"
+run = "mise daemons start"
+
+[daemons.backend]
+task = "dev:backend"
+ready_port = 8080
+
+[daemons.frontend]
+task = "dev:frontend"
+ready_port = 5173
+
+[daemon_groups]
+default = ["backend", "frontend"]

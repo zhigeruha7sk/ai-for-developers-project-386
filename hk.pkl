@@ -1,0 +1,20 @@
+amends "package://github.com/jdx/hk/releases/download/v2.11.0/hk@2.11.0#/Config.pkl"
+
+local project_checks = new Mapping<String, Step> {
+  ["lint"] {
+    check = "mise run lint"
+  }
+  ["typecheck"] {
+    check = "mise run typecheck"
+  }
+}
+
+hooks {
+  ["check"] {
+    steps = project_checks
+  }
+  ["pre-commit"] {
+    fix = false
+    steps = project_checks
+  }
+}
