@@ -16,6 +16,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
+  /api/meeting-types:
+    get:
+      operationId: Api_listMeetingTypes
+      summary: Список типов встреч
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MeetingType'
 components:
   schemas:
     HealthResponse:
@@ -31,6 +45,28 @@ components:
       enum:
         - UP
       description: Состояние сервиса.
+    MeetingType:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - durationMinutes
+      properties:
+        id:
+          type: string
+          description: Устойчивый идентификатор типа встречи.
+        name:
+          type: string
+          description: Название типа встречи.
+        description:
+          type: string
+          description: Описание типа встречи.
+        durationMinutes:
+          type: integer
+          format: int32
+          description: Длительность встречи в минутах.
+      description: Тип встречи, который заводит владелец календаря.
 servers:
   - url: http://localhost:8080
     description: Local development server
