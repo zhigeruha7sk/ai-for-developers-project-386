@@ -1,26 +1,8 @@
 import { Link } from 'react-router-dom';
-import { useGuest } from '../context/GuestContext';
 
 export default function HomePage() {
-  const { guest } = useGuest();
-
   return (
     <div className="home-page">
-      <span className="guest-badge">
-        <span className="guest-name">{guest.name || 'Гость'}</span>
-      </span>
-
-      <section className="home-hero">
-        <h1 className="hero-title">Календарь звонков</h1>
-        <p className="hero-text">
-          Выберите удобное время и забронируйте встречу. Свободные слоты показываются по часовому
-          поясу Asia/Almaty.
-        </p>
-        <Link to="/booking" className="button button-primary button-large">
-          Выбрать время
-        </Link>
-      </section>
-
       <section className="home-bottom">
         <div className="home-half">
           <p className="kicker">БЫСТРАЯ ЗАПИСЬ НА ЗВОНОК</p>
