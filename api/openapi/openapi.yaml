@@ -4,6 +4,37 @@ info:
   version: 0.0.0
 tags: []
 paths:
+  /api/bookings:
+    get:
+      operationId: Api_listBookings
+      summary: Предстоящие записи
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+    post:
+      operationId: Api_createBooking
+      summary: Записаться на встречу
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingInput'
   /api/health:
     get:
       operationId: Api_health
@@ -30,8 +61,160 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MeetingType'
+    post:
+      operationId: Api_createMeetingType
+      summary: Создать тип встречи
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeetingType'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MeetingTypeInput'
+  /api/meeting-types/{id}:
+    put:
+      operationId: Api_updateMeetingType
+      summary: Изменить тип встречи
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeetingType'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MeetingTypeInput'
+    delete:
+      operationId: Api_deleteMeetingType
+      summary: Удалить тип встречи
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+  /api/slots:
+    get:
+      operationId: Api_listSlots
+      summary: Слоты типа встречи на выбранную дату
+      parameters:
+        - name: meetingTypeId
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Slot'
 components:
   schemas:
+    Booking:
+      type: object
+      required:
+        - id
+        - meetingTypeId
+        - meetingTypeName
+        - date
+        - startTime
+        - endTime
+        - guestName
+        - guestAvatar
+      properties:
+        id:
+          type: string
+          description: Идентификатор брони.
+        meetingTypeId:
+          type: string
+          description: Идентификатор типа встречи.
+        meetingTypeName:
+          type: string
+          description: Название типа встречи на момент записи.
+        date:
+          type: string
+          format: date
+          description: Дата встречи.
+        startTime:
+          type: string
+          format: time
+          description: Время начала встречи.
+        endTime:
+          type: string
+          format: time
+          description: Время окончания встречи.
+        guestName:
+          type: string
+          description: Имя гостя.
+        guestAvatar:
+          type: string
+          description: Аватар гостя.
+        note:
+          type: string
+          description: Необязательная заметка к брони.
+      description: Запись гостя на встречу.
+    BookingInput:
+      type: object
+      required:
+        - meetingTypeId
+        - date
+        - startTime
+        - guestName
+        - guestAvatar
+      properties:
+        meetingTypeId:
+          type: string
+          description: Идентификатор выбранного типа встречи.
+        date:
+          type: string
+          format: date
+          description: Дата встречи.
+        startTime:
+          type: string
+          format: time
+          description: Время начала встречи.
+        guestName:
+          type: string
+          description: Имя гостя.
+        guestAvatar:
+          type: string
+          description: Аватар гостя.
+        note:
+          type: string
+          description: Необязательная заметка к брони.
+      description: Данные для создания брони.
     HealthResponse:
       type: object
       required:
@@ -67,6 +250,43 @@ components:
           format: int32
           description: Длительность встречи в минутах.
       description: Тип встречи, который заводит владелец календаря.
+    MeetingTypeInput:
+      type: object
+      required:
+        - name
+        - description
+        - durationMinutes
+      properties:
+        name:
+          type: string
+          description: Название типа встречи.
+        description:
+          type: string
+          description: Описание типа встречи.
+        durationMinutes:
+          type: integer
+          format: int32
+          description: Длительность встречи в минутах.
+      description: Данные для создания или изменения типа встречи.
+    Slot:
+      type: object
+      required:
+        - startTime
+        - endTime
+        - available
+      properties:
+        startTime:
+          type: string
+          format: time
+          description: Время начала слота.
+        endTime:
+          type: string
+          format: time
+          description: Время окончания слота.
+        available:
+          type: boolean
+          description: Можно ли записаться на этот слот.
+      description: Свободный или занятый слот на выбранную дату.
 servers:
   - url: http://localhost:8080
     description: Local development server

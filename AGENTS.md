@@ -19,19 +19,19 @@
 
 ## Команды
 
-| Команда | Что делает |
-| --- | --- |
-| `mise install` | Ставит инструменты из `mise.toml` и зависимости проекта |
-| `mise run install` | Ставит зависимости npm и Maven |
-| `mise run check` | Все проверки: линтеры, типы, тесты |
-| `mise run lint` | Линтеры TypeSpec, Java (Spotless), фронтенда (ESLint + Prettier) |
-| `mise run typecheck` | Проверка типов фронтенда по сгенерированному SDK |
-| `mise run test` | Тесты бэкенда (JUnit) |
-| `mise run api:gen` | Компилирует TypeSpec в OpenAPI |
-| `mise run sdk:gen` | Генерирует TypeScript SDK из OpenAPI |
-| `mise run build` | Собирает бэкенд и фронтенд |
-| `mise run dev` | Запускает daemons: бэкенд `:8080`, фронтенд `:5173` |
-| `mise daemons status` / `logs` / `stop` | Управление фоновыми сервисами |
+| Команда                                 | Что делает                                                       |
+| --------------------------------------- | ---------------------------------------------------------------- |
+| `mise install`                          | Ставит инструменты из `mise.toml` и зависимости проекта          |
+| `mise run install`                      | Ставит зависимости npm и Maven                                   |
+| `mise run check`                        | Все проверки: линтеры, типы, тесты                               |
+| `mise run lint`                         | Линтеры TypeSpec, Java (Spotless), фронтенда (ESLint + Prettier) |
+| `mise run typecheck`                    | Проверка типов фронтенда по сгенерированному SDK                 |
+| `mise run test`                         | Тесты бэкенда (JUnit)                                            |
+| `mise run api:gen`                      | Компилирует TypeSpec в OpenAPI                                   |
+| `mise run sdk:gen`                      | Генерирует TypeScript SDK из OpenAPI                             |
+| `mise run build`                        | Собирает бэкенд и фронтенд                                       |
+| `mise run dev`                          | Запускает daemons: бэкенд `:8080`, фронтенд `:5173`              |
+| `mise daemons status` / `logs` / `stop` | Управление фоновыми сервисами                                    |
 
 Перед коммитом достаточно `mise run check` — эта же команда выполняется в GitHub Actions.
 
