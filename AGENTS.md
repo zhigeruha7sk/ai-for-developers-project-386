@@ -80,3 +80,17 @@
 - Не редактировать и не удалять `.github/workflows/hexlet-check.yml`.
 - Не переименовывать репозиторий.
 - Не коммитить `node_modules`, `backend/target`, `frontend/dist`, `frontend/src/api/generated`.
+
+## Agent skills
+
+### Issue tracker
+
+Issues живут в GitHub Issues этого репозитория (через CLI `gh`). См. `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Дефолтные пять канонических ролей: needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix. См. `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` + `docs/adr/` в корне репозитория. См. `docs/agents/domain.md`.

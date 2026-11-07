@@ -12,6 +12,10 @@ frontend/src/api/generated/
 mise.local.toml
 hk.local.pkl
 
+# agent skills (installed via skills CLI)
+.agents/
+skills-lock.json
+
 # editors and OS
 .idea/
 .vscode/
