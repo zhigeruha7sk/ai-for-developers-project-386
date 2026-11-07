@@ -37,7 +37,7 @@ export default function BookingTypePage() {
   if (state === 'loading') return <p>Загружаем…</p>;
   if (state === 'missing')
     return (
-      <div>
+      <div className="types-page">
         <h1>Типы встреч недоступны</h1>
         <p>{error ?? 'Произошла ошибка при загрузке типов встреч.'}</p>
         <button
@@ -57,7 +57,7 @@ export default function BookingTypePage() {
 
   if (meetingTypes.length === 0)
     return (
-      <div>
+      <div className="types-page">
         <h1>Типы встреч недоступны</h1>
         <p>Типы встреч не найдены в ответе сервера. Попробуйте нажать "Попробовать снова".</p>
         <button onClick={() => setState('loading')} className="button">
@@ -70,8 +70,8 @@ export default function BookingTypePage() {
     );
 
   return (
-    <div>
-      <h1>Выберите тип события</h1>
+    <div className="types-page">
+      <h1 className="page-heading">Выберите тип события</h1>
 
       <ul className="meeting-types">
         {meetingTypes.map((t) => (

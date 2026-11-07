@@ -240,6 +240,9 @@ a {
 }
 
 /* ============ Meeting type cards ============ */
+.types-page {
+  padding: 24px clamp(16px, 4vw, 48px);
+}
 .meeting-types {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
