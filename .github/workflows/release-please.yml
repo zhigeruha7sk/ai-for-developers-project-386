@@ -1,9 +1,10 @@
 name: release-please
 
+# По спеке (docs/spec.md): автоматические релизы подключаются на шаге
+# реализации после первой функции. До тех пор — только ручной запуск,
+# чтобы не падать на каждом push.
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 permissions:
   contents: write
