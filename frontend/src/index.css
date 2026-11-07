@@ -127,21 +127,19 @@ a {
 }
 
 /* ============ Home page ============
-   По спеке: нижний блок на всю ширину и 35% высоты страницы,
-   остальная часть страницы пустая. */
+   Hero-блок на всю ширину сразу под шапкой, минимальная высота — 35%
+   экрана (может расти по контенту); остальная часть страницы пустая. */
 .home-page {
   display: flex;
   flex-direction: column;
   flex: 1;
 }
-.home-bottom {
-  margin-top: auto;
-  height: 35vh;
+.home-hero {
+  min-height: 35vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   padding: 12px clamp(16px, 4vw, 48px);
-  overflow-y: auto;
 }
 .home-half {
   display: flex;
@@ -169,7 +167,7 @@ a {
   line-height: 1.4;
   margin: 0;
 }
-.home-bottom .button-large {
+.home-hero .button-large {
   align-self: flex-start;
   padding: 10px 20px;
   font-size: 15px;
@@ -180,8 +178,7 @@ a {
   margin: 0 0 8px 0;
 }
 .home-features {
-  list-style: none;
-  padding: 0;
+  padding-left: 20px;
   margin: 0;
 }
 .home-features li {
@@ -548,9 +545,8 @@ a {
 
 /* ============ Responsive ============ */
 @media (max-width: 720px) {
-  .home-bottom {
+  .home-hero {
     grid-template-columns: 1fr;
-    height: auto;
     min-height: 45vh;
   }
   .home-half {
