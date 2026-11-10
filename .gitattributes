@@ -1,5 +1,9 @@
 * text=auto
 
+# Prettier defaults to endOfLine=lf, so frontend files must always check out as LF
+# even on Windows; everything else keeps the core.autocrlf behavior.
+frontend/** text eol=lf
+
 *.sh text eol=lf
 mvnw text eol=lf
 *.cmd text eol=crlf
