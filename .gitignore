@@ -11,6 +11,7 @@ frontend/src/api/generated/
 # local state
 mise.local.toml
 hk.local.pkl
+.vitest/
 
 # agent skills (installed via skills CLI)
 .agents/
