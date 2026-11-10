@@ -61,9 +61,14 @@ depends = ["frontend:typecheck"]
 description = "Run backend tests"
 run = "mvn -B -f backend/pom.xml test"
 
+[tasks."frontend:test"]
+description = "Run frontend tests"
+depends = ["sdk:gen"]
+run = "npm --prefix frontend run test"
+
 [tasks.test]
 description = "Run every test suite"
-depends = ["backend:test"]
+depends = ["backend:test", "frontend:test"]
 
 [tasks.check]
 description = "Run every check used locally and in CI"
