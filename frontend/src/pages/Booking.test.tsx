@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import type { Booking, MeetingType, Slot } from '../api/generated';
 import { apiCreateBooking, apiListMeetingTypes, apiListSlots } from '../api/generated';
 import BookingPage from './Booking';
+import BookingTypePage from './BookingType';
+import HomePage from './Home';
 
 // Стратегия карты: мок на уровне сгенерированного SDK, backend не поднимается.
 vi.mock('../api/generated', () => ({
@@ -39,6 +41,19 @@ function renderBookingPage() {
   return render(
     <MemoryRouter initialEntries={['/booking/type-1']}>
       <Routes>
+        <Route path="/booking/:typeId" element={<BookingPage />} />
+      </Routes>
+    </MemoryRouter>,
+  );
+}
+
+// Маршруты как в приложении: «/» — главная, «/booking» — выбор типа события.
+function renderBookingApp() {
+  return render(
+    <MemoryRouter initialEntries={['/booking/type-1']}>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/booking" element={<BookingTypePage />} />
         <Route path="/booking/:typeId" element={<BookingPage />} />
       </Routes>
     </MemoryRouter>,
@@ -153,5 +168,53 @@ describe('страница бронирования', () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it('после успешной записи показывает подтверждение и возвращает на главную', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.mocked(apiCreateBooking).mockResolvedValue({ data: createdBooking, error: undefined });
+
+    renderBookingApp();
+
+    fireEvent.click(await screen.findByRole('button', { name: /09:00 – 09:30/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Продолжить' }));
+
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'Вы успешно записаны! Возвращаемся на главную…',
+    );
+    // Подтверждение видно, гость ещё на странице слотов.
+    expect(screen.queryByText('БЫСТРАЯ ЗАПИСЬ НА ЗВОНОК')).toBeNull();
+
+    // Через 2,5 секунды — переход на главную, без реального ожидания.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2500);
+    });
+
+    expect(screen.getByText('БЫСТРАЯ ЗАПИСЬ НА ЗВОНОК')).toBeInTheDocument();
+    expect(screen.queryByRole('status')).toBeNull();
+  });
+
+  it('кнопка «Назад» со страницы слотов возвращает к выбору типа события', async () => {
+    renderBookingApp();
+
+    // Дожидаемся загрузки слотов, чтобы страница была в рабочем состоянии.
+    await screen.findByRole('button', { name: /09:00 – 09:30/ });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Назад' }));
+
+    expect(await screen.findByText('Выберите тип события')).toBeInTheDocument();
+    expect(screen.queryByText('Статус слотов')).toBeNull();
+  });
+
+  it('ошибка загрузки слотов показывает гостю понятный текст', async () => {
+    vi.mocked(apiListSlots).mockResolvedValue({
+      data: undefined,
+      error: { message: 'network down' },
+    });
+
+    renderBookingPage();
+
+    expect(await screen.findByText('Не удалось загрузить слоты.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /09:00 – 09:30/ })).toBeNull();
   });
 });
