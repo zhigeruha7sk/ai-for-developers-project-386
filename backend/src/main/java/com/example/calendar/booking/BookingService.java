@@ -10,6 +10,7 @@ import static com.example.calendar.CalendarTime.ZONE;
 import com.example.calendar.meeting.MeetingType;
 import com.example.calendar.meeting.MeetingTypeCatalog;
 import com.example.calendar.meeting.MeetingTypeNotFoundException;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -31,11 +32,13 @@ public class BookingService {
 
   private final MeetingTypeCatalog meetingTypes;
   private final BookingRepository bookings;
+  private final Clock clock;
   private final ReentrantLock lock = new ReentrantLock();
 
-  public BookingService(MeetingTypeCatalog meetingTypes, BookingRepository bookings) {
+  public BookingService(MeetingTypeCatalog meetingTypes, BookingRepository bookings, Clock clock) {
     this.meetingTypes = meetingTypes;
     this.bookings = bookings;
+    this.clock = clock;
   }
 
   /** Слоты выбранного типа на дату, с пометкой о доступности. */
@@ -67,7 +70,7 @@ public class BookingService {
     MeetingType type = meetingTypeById(meetingTypeId);
     int step = type.durationMinutes();
 
-    LocalDate today = LocalDate.now(ZONE);
+    LocalDate today = LocalDate.now(clock);
     if (date.isBefore(today)) {
       throw new IllegalArgumentException("Дата встречи уже прошла");
     }
@@ -108,7 +111,6 @@ public class BookingService {
 
   /** Предстоящие встречи, отсортированные по дате и времени. */
   public List<Booking> upcoming() {
-    ZonedDateTime now = ZonedDateTime.now(ZONE);
     return bookings.findAll().stream()
         .filter(booking -> !isPast(booking.date(), booking.startTime()))
         .sorted(Comparator.comparing(Booking::date).thenComparing(Booking::startTime))
@@ -120,7 +122,7 @@ public class BookingService {
   }
 
   private boolean isPast(LocalDate date, LocalTime time) {
-    return ZonedDateTime.of(date, time, ZONE).isBefore(ZonedDateTime.now(ZONE));
+    return ZonedDateTime.of(date, time, ZONE).isBefore(ZonedDateTime.now(clock));
   }
 
   private boolean isWorkingSlot(LocalTime start, int step) {

@@ -1,12 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-
-// Simple type for meeting type
-type MeetingType = {
-  id: string;
-  name: string;
-  durationMinutes: number;
-};
+import { apiListMeetingTypes } from '../api/generated';
+import type { MeetingType } from '../api/generated';
 
 export default function BookingTypePage() {
   const [meetingTypes, setMeetingTypes] = useState<MeetingType[]>([]);
@@ -14,25 +9,23 @@ export default function BookingTypePage() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Use Vite proxy: /api -> http://localhost:8080
-    fetch('/api/meeting-types')
-      .then((response) => {
-        if (!response.ok) throw new Error('Network response was not ok');
-        return response.json();
-      })
-      .then((data) => {
-        console.log('API data:', data);
-        setMeetingTypes(data ?? []);
-        setState('ready');
-        setError(null);
-      })
-      .catch((err) => {
-        console.error('Failed to fetch meeting types:', err);
-        setState('missing');
-        setError('Не удалось загрузить типы встреч');
-      });
+  const load = useCallback(async () => {
+    setState('loading');
+    setError(null);
+    const result = await apiListMeetingTypes();
+    if (result.error && !result.data) {
+      setMeetingTypes([]);
+      setState('missing');
+      setError('Не удалось загрузить типы встреч');
+      return;
+    }
+    setMeetingTypes(result.data ?? []);
+    setState('ready');
   }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   if (state === 'loading') return <p>Загружаем…</p>;
   if (state === 'missing')
@@ -40,13 +33,7 @@ export default function BookingTypePage() {
       <div className="types-page">
         <h1>Типы встреч недоступны</h1>
         <p>{error ?? 'Произошла ошибка при загрузке типов встреч.'}</p>
-        <button
-          onClick={() => {
-            setState('loading');
-            setError(null);
-          }}
-          className="button"
-        >
+        <button onClick={() => void load()} className="button">
           Попробовать снова
         </button>
         <Link to="/" className="button">
@@ -59,8 +46,8 @@ export default function BookingTypePage() {
     return (
       <div className="types-page">
         <h1>Типы встреч недоступны</h1>
-        <p>Типы встреч не найдены в ответе сервера. Попробуйте нажать "Попробовать снова".</p>
-        <button onClick={() => setState('loading')} className="button">
+        <p>Типы встреч не найдены в ответе сервера. Попробуйте нажать «Попробовать снова».</p>
+        <button onClick={() => void load()} className="button">
           Попробовать снова
         </button>
         <Link to="/" className="button">

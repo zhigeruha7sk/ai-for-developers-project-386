@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import type { Booking, MeetingType, Slot } from '../api/generated';
@@ -47,8 +47,13 @@ function renderBookingPage() {
 
 beforeEach(() => {
   localStorage.clear();
+  vi.clearAllMocks();
   vi.mocked(apiListMeetingTypes).mockResolvedValue({ data: [meetingType], error: undefined });
   vi.mocked(apiListSlots).mockResolvedValue({ data: slots, error: undefined });
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe('страница бронирования', () => {
@@ -75,6 +80,7 @@ describe('страница бронирования', () => {
         guestAvatar: '🦊',
       },
     });
+    expect(localStorage.getItem('calendar-guest')).not.toBeNull();
   });
 
   it('конфликт: занятый слот отклоняется с понятным сообщением гостю', async () => {
@@ -94,5 +100,58 @@ describe('страница бронирования', () => {
     ).toBeInTheDocument();
     expect(screen.queryByRole('status')).toBeNull();
     expect(screen.queryByText('Вы успешно записаны! Возвращаемся на главную…')).toBeNull();
+  });
+
+  it('занятый слот помечен «Занято» и недоступен для выбора', async () => {
+    renderBookingPage();
+
+    const busySlot = await screen.findByRole('button', { name: /09:30 – 10:00/ });
+    expect(busySlot).toBeDisabled();
+    expect(busySlot).toHaveTextContent('Занято');
+    expect(screen.getByRole('button', { name: 'Продолжить' })).toBeDisabled();
+  });
+
+  it('неизвестный тип встречи показывает заглушку и ссылку назад', async () => {
+    vi.mocked(apiListMeetingTypes).mockResolvedValue({ data: [], error: undefined });
+
+    renderBookingPage();
+
+    expect(await screen.findByText('Тип встречи не найден.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Назад к типам' })).toHaveAttribute('href', '/booking');
+  });
+
+  it('ошибка 400 показывает гостю сообщение о дате и времени', async () => {
+    vi.mocked(apiCreateBooking).mockResolvedValue({
+      data: undefined,
+      error: { message: 'bad request' },
+      response: new Response(null, { status: 400 }),
+    });
+
+    renderBookingPage();
+
+    fireEvent.click(await screen.findByRole('button', { name: /09:00 – 09:30/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Продолжить' }));
+
+    expect(
+      await screen.findByText('Не удалось записаться: проверьте выбранные дату и время.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('status')).toBeNull();
+  });
+
+  it('блокирует даты вне окна записи', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.setSystemTime(new Date('2026-11-12T05:00:00Z'));
+
+    try {
+      renderBookingPage();
+
+      expect(await screen.findByText('Календарь')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '11' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: '12' })).toBeEnabled();
+      expect(screen.getByRole('button', { name: '25' })).toBeEnabled();
+      expect(screen.getByRole('button', { name: '26' })).toBeDisabled();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

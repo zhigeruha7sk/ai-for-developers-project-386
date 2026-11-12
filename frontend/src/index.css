@@ -509,6 +509,52 @@ a {
   margin: 0 auto;
   padding: 24px;
 }
+.admin-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 12px 0 20px 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.admin-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.admin-form input {
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font: inherit;
+}
+.admin-form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+}
+.admin-types {
+  grid-template-columns: 1fr;
+}
+.admin-type-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.admin-type-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
 .admin-table {
   width: 100%;
   border-collapse: collapse;
@@ -557,6 +603,12 @@ a {
   }
   .meeting-types {
     grid-template-columns: 1fr;
+  }
+  .admin-form {
+    grid-template-columns: 1fr;
+  }
+  .admin-type-actions {
+    margin-left: 0;
   }
   .booking-blocks {
     grid-template-columns: 1fr;
