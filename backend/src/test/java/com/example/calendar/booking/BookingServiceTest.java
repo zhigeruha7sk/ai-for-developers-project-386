@@ -50,6 +50,41 @@ class BookingServiceTest {
   }
 
   @Test
+  void fifteenMinuteSlotsFillWorkingHoursWithDurationStep() {
+    List<Slot> slots = service.slots("meeting-15", today.plusDays(1));
+
+    assertThat(slots).hasSize(32);
+    assertThat(slots)
+        .allSatisfy(slot -> assertThat(slot.endTime()).isEqualTo(slot.startTime().plusMinutes(15)));
+    List<LocalTime> starts = slots.stream().map(Slot::startTime).toList();
+    assertThat(starts)
+        .contains(
+            LocalTime.of(9, 0), LocalTime.of(12, 45), LocalTime.of(14, 0), LocalTime.of(17, 45))
+        .doesNotContain(LocalTime.of(13, 0), LocalTime.of(18, 0));
+  }
+
+  @Test
+  void sixtyMinuteSlotsStartOnTheHourWithinWorkingPeriods() {
+    MeetingType sixty = meetingTypes.create("Встреча 60 минут", "Часовой шаг", 60);
+
+    List<Slot> slots = service.slots(sixty.id(), today.plusDays(1));
+
+    List<LocalTime> starts = slots.stream().map(Slot::startTime).toList();
+    assertThat(starts)
+        .containsExactly(
+            LocalTime.of(9, 0),
+            LocalTime.of(10, 0),
+            LocalTime.of(11, 0),
+            LocalTime.of(12, 0),
+            LocalTime.of(14, 0),
+            LocalTime.of(15, 0),
+            LocalTime.of(16, 0),
+            LocalTime.of(17, 0));
+    assertThat(slots)
+        .allSatisfy(slot -> assertThat(slot.endTime()).isEqualTo(slot.startTime().plusHours(1)));
+  }
+
+  @Test
   void fortyFiveMinuteSlotsStopAtWorkingIntervalEnd() {
     MeetingType fortyFive = meetingTypes.create("Встреча 45 минут", "Нестандартный шаг", 45);
 

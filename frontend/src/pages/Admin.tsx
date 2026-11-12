@@ -73,7 +73,11 @@ export default function AdminPage() {
     setSaving(false);
 
     if (result.error) {
-      setFormError('Не удалось сохранить тип встречи. Проверьте поля.');
+      setFormError(
+        result.response?.status === 400
+          ? 'Не удалось сохранить тип встречи. Проверьте поля.'
+          : 'Не удалось сохранить тип встречи. Попробуйте ещё раз.',
+      );
       return;
     }
 

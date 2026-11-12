@@ -13,7 +13,7 @@ export default function BookingTypePage() {
     setState('loading');
     setError(null);
     const result = await apiListMeetingTypes();
-    if (result.error && !result.data) {
+    if (result.error) {
       setMeetingTypes([]);
       setState('missing');
       setError('Не удалось загрузить типы встреч');

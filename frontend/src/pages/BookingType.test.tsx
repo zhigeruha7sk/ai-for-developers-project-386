@@ -53,6 +53,19 @@ describe('страница выбора типа события', () => {
     expect(await screen.findByText('Страница выбора слота')).toBeInTheDocument();
   });
 
+  it('ответ с данными, но с ошибкой считается неудачной загрузкой', async () => {
+    // Тип SDK делает data и error взаимоисключающими, но в рантайме возможны оба сразу.
+    const degraded = {
+      data: meetingTypes,
+      error: { message: 'degraded response' },
+    } as unknown as Awaited<ReturnType<typeof apiListMeetingTypes>>;
+    vi.mocked(apiListMeetingTypes).mockResolvedValue(degraded);
+
+    renderBookingTypePage();
+
+    expect(await screen.findByText('Типы встреч недоступны')).toBeInTheDocument();
+  });
+
   it('после ошибки кнопка «Попробовать снова» повторяет загрузку', async () => {
     vi.mocked(apiListMeetingTypes)
       .mockResolvedValueOnce({ data: undefined, error: { message: 'network down' } })

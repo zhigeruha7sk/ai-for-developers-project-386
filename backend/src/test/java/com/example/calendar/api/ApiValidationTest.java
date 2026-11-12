@@ -1,5 +1,6 @@
 package com.example.calendar.api;
 
+import static com.example.calendar.CalendarTime.ZONE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
@@ -8,20 +9,20 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
+import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ApiValidationTest {
 
-  private static final ZoneId ZONE = ZoneId.of("Asia/Almaty");
-
   @Autowired private Environment environment;
+
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
   private final HttpClient client =
       HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
@@ -204,9 +205,7 @@ class ApiValidationTest {
     return URI.create("http://localhost:" + environment.getProperty("local.server.port") + path);
   }
 
-  private String extractId(String body) {
-    int start = body.indexOf("\"id\":\"") + "\"id\":\"".length();
-    int end = body.indexOf('"', start);
-    return start >= "\"id\":\"".length() ? body.substring(start, end) : "";
+  private String extractId(String body) throws Exception {
+    return objectMapper.readTree(body).get("id").asText();
   }
 }

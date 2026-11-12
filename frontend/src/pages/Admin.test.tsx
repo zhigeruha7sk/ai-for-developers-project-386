@@ -79,6 +79,61 @@ describe('админка', () => {
     expect(screen.getByText('2026-11-13')).toBeInTheDocument();
   });
 
+  it('восстанавливает гостя из localStorage и показывает его в бейдже', async () => {
+    localStorage.setItem(
+      'calendar-guest',
+      JSON.stringify({ name: 'Анна Постоянная', avatar: '🦉' }),
+    );
+
+    renderAdminPage();
+
+    expect(await screen.findByText('Анна Постоянная')).toBeInTheDocument();
+  });
+
+  it('при ответе 400 просит проверить поля', async () => {
+    vi.mocked(apiCreateMeetingType).mockResolvedValue({
+      data: undefined,
+      error: { message: 'bad request' },
+      response: new Response(null, { status: 400 }),
+    });
+
+    renderAdminPage();
+
+    fireEvent.change(await screen.findByLabelText('Название'), {
+      target: { value: 'Новый тип' },
+    });
+    fireEvent.change(screen.getByLabelText('Описание'), {
+      target: { value: 'Описание нового типа' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить тип' }));
+
+    expect(
+      await screen.findByText('Не удалось сохранить тип встречи. Проверьте поля.'),
+    ).toBeInTheDocument();
+  });
+
+  it('при прочих ошибках сохранения показывает общее сообщение', async () => {
+    vi.mocked(apiCreateMeetingType).mockResolvedValue({
+      data: undefined,
+      error: { message: 'server error' },
+      response: new Response(null, { status: 500 }),
+    });
+
+    renderAdminPage();
+
+    fireEvent.change(await screen.findByLabelText('Название'), {
+      target: { value: 'Новый тип' },
+    });
+    fireEvent.change(screen.getByLabelText('Описание'), {
+      target: { value: 'Описание нового типа' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить тип' }));
+
+    expect(
+      await screen.findByText('Не удалось сохранить тип встречи. Попробуйте ещё раз.'),
+    ).toBeInTheDocument();
+  });
+
   it('создаёт тип встречи через SDK и перечитывает список', async () => {
     renderAdminPage();
 

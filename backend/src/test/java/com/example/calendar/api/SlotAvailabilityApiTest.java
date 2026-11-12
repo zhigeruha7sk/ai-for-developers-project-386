@@ -1,5 +1,6 @@
 package com.example.calendar.api;
 
+import static com.example.calendar.CalendarTime.ZONE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
@@ -11,8 +12,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -25,6 +27,8 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Верхний шов: доступность слотов на «сегодня» и гонки бронирования. «Сегодня» фиксировано тестовым
@@ -32,8 +36,6 @@ import org.springframework.core.env.Environment;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class SlotAvailabilityApiTest {
-
-  private static final ZoneId ZONE = ZoneId.of("Asia/Almaty");
 
   /** Фиксированное «сейчас»: 11:15 в Asia/Almaty. */
   private static final Instant FIXED_NOW = Instant.parse("2026-11-16T06:15:00Z");
@@ -55,19 +57,24 @@ class SlotAvailabilityApiTest {
   private final HttpClient client =
       HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
 
+  private final ObjectMapper objectMapper = new ObjectMapper();
+
   @Test
   void todaySlotsMarkPastStartsUnavailableAndFutureStartsAvailable() throws Exception {
     HttpResponse<String> response = get("/api/slots?meetingTypeId=meeting-30&date=" + TODAY);
 
     assertThat(response.statusCode()).isEqualTo(200);
+    Map<String, JsonNode> slotsByStart = new HashMap<>();
+    for (JsonNode slot : objectMapper.readTree(response.body())) {
+      slotsByStart.put(slot.get("startTime").asText(), slot);
+    }
     // Прошедшие старты недоступны, будущие свободны; граница — между 11:00 и 11:30.
-    assertThat(response.body())
-        .contains("\"startTime\":\"09:00:00\",\"endTime\":\"09:30:00\",\"available\":false")
-        .contains("\"startTime\":\"11:00:00\",\"endTime\":\"11:30:00\",\"available\":false")
-        .contains("\"startTime\":\"11:30:00\",\"endTime\":\"12:00:00\",\"available\":true")
-        .contains("\"startTime\":\"14:00:00\",\"endTime\":\"14:30:00\",\"available\":true")
-        .contains("\"startTime\":\"17:30:00\",\"endTime\":\"18:00:00\",\"available\":true")
-        .doesNotContain("\"startTime\":\"13:00:00\"");
+    assertSlot(slotsByStart, "09:00:00", "09:30:00", false);
+    assertSlot(slotsByStart, "11:00:00", "11:30:00", false);
+    assertSlot(slotsByStart, "11:30:00", "12:00:00", true);
+    assertSlot(slotsByStart, "14:00:00", "14:30:00", true);
+    assertSlot(slotsByStart, "17:30:00", "18:00:00", true);
+    assertThat(slotsByStart).doesNotContainKey("13:00:00");
   }
 
   @Test
@@ -119,9 +126,19 @@ class SlotAvailabilityApiTest {
     HttpResponse<String> adjacent =
         post("/api/bookings", booking("meeting-15", date, "10:30", "Стыковой гость", "🦁"));
     assertThat(adjacent.statusCode()).isEqualTo(200);
-    assertThat(adjacent.body())
-        .contains("\"startTime\":\"10:30:00\"")
-        .contains("\"endTime\":\"10:45:00\"");
+    JsonNode created = objectMapper.readTree(adjacent.body());
+    assertThat(created.get("startTime").asText()).isEqualTo("10:30:00");
+    assertThat(created.get("endTime").asText()).isEqualTo("10:45:00");
+  }
+
+  private void assertSlot(
+      Map<String, JsonNode> slotsByStart, String startTime, String endTime, boolean available) {
+    JsonNode slot = slotsByStart.get(startTime);
+    assertThat(slot).as("слот %s", startTime).isNotNull();
+    assertThat(slot.get("endTime").asText()).as("конец слота %s", startTime).isEqualTo(endTime);
+    assertThat(slot.get("available").asBoolean())
+        .as("доступность слота %s", startTime)
+        .isEqualTo(available);
   }
 
   private String booking(
