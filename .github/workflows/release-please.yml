@@ -1,26 +1,27 @@
 name: release-please
 
-# По спеке (docs/spec.md): автоматические релизы подключаются на шаге
-# реализации после первой функции. До тех пор — только ручной запуск,
-# чтобы не падать на каждом push.
+# Release-please ведёт релизный контур из Conventional Commits: на пуше в main
+# открывает или обновляет release PR с changelog и следующей версией, а после
+# merge такого PR создаёт git tag и GitHub Release. Публикация артефактов в
+# реестры не входит — только релизный контур поверх зелёного CI.
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
   contents: write
+  issues: write
   pull-requests: write
 
 jobs:
-  release:
+  release-please:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: google-github-actions/release-please-action@v4
+      - uses: googleapis/release-please-action@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          package-name: calendar
-          manifest-file: CHANGELOG.md
+          # simple: репозиторий с version.txt и CHANGELOG.md в корне
           release-type: simple
-          subdir: ./
-          draft: false
-          bump-out-of-cycle: true
