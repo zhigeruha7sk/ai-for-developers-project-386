@@ -25,8 +25,8 @@ jobs:
       - name: Install dependencies
         run: mise run install
 
-      - name: Install Playwright browsers
-        run: npm --prefix frontend exec playwright install --with-deps chromium
+      - name: Install Playwright system dependencies
+        run: npm --prefix frontend exec playwright install-deps chromium
 
       - name: Verify generated OpenAPI is up to date
         run: |
