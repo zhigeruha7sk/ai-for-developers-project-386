@@ -14,6 +14,10 @@
 - `frontend/` — React 19, Vite 8, TypeScript 6. SDK в `frontend/src/api/generated` генерируется и в
   git не попадает.
 - `mise.toml` — версии инструментов, переменные окружения и все задачи.
+- `Dockerfile` — production-образ: фронтенд и SDK собираются, статика кладётся в Spring Boot jar,
+  приложение слушает `PORT`.
+- `railway.json` — деплой Docker-образа на Railway и healthcheck `/api/health`.
+- `opencode.json` — проектная конфигурация MCP-сервера Railway (OAuth, без секретов).
 - `hk.pkl` — git-хуки, вызывают те же проверки, что и CI.
 - `docs/spec.md` — источник требований к продукту.
 

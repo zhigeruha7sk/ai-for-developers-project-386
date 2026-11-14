@@ -1,0 +1,15 @@
+.git
+.github
+.idea
+.agents
+.vscode
+
+node_modules
+**/node_modules
+frontend/dist
+frontend/test-results
+frontend/playwright-report
+frontend/blob-report
+backend/target
+
+*.log
