@@ -17,6 +17,42 @@ model HealthResponse {
   status: HealthStatus;
 }
 
+/** Тело ошибки в формате RFC 7807. */
+model ProblemDetail {
+  /** URI типа ошибки. */
+  type: string;
+
+  /** Краткое описание ошибки. */
+  title: string;
+
+  /** HTTP-статус ошибки. */
+  status: int32;
+
+  /** Подробное описание ошибки. */
+  detail: string;
+
+  /** URI запроса, в котором произошла ошибка. */
+  instance?: string;
+}
+
+/** Ошибка валидации данных запроса. */
+@error
+model BadRequest is ProblemDetail {
+  @statusCode statusCode: 400;
+}
+
+/** Запрошенный ресурс не найден. */
+@error
+model NotFound is ProblemDetail {
+  @statusCode statusCode: 404;
+}
+
+/** Запрошенное время уже занято другой встречей. */
+@error
+model Conflict is ProblemDetail {
+  @statusCode statusCode: 409;
+}
+
 /** Тип встречи, который заводит владелец календаря. */
 model MeetingType {
   /** Устойчивый идентификатор типа встречи. */
@@ -122,15 +158,15 @@ namespace Api {
   @summary("Создать тип встречи")
   @post
   @route("/meeting-types")
-  op createMeetingType(@body body: MeetingTypeInput): MeetingType;
+  op createMeetingType(@body body: MeetingTypeInput): MeetingType | BadRequest;
 
   @summary("Изменить тип встречи")
   @put
   @route("/meeting-types/{id}")
-  op updateMeetingType(
-    @path id: string,
-    @body body: MeetingTypeInput,
-  ): MeetingType;
+  op updateMeetingType(@path id: string, @body body: MeetingTypeInput):
+    | MeetingType
+    | BadRequest
+    | NotFound;
 
   @summary("Удалить тип встречи")
   @delete
@@ -140,7 +176,10 @@ namespace Api {
   @summary("Слоты типа встречи на выбранную дату")
   @get
   @route("/slots")
-  op listSlots(@query meetingTypeId: string, @query date: plainDate): Slot[];
+  op listSlots(@query meetingTypeId: string, @query date: plainDate):
+    | Slot[]
+    | BadRequest
+    | NotFound;
 
   @summary("Предстоящие записи")
   @get
@@ -150,5 +189,9 @@ namespace Api {
   @summary("Записаться на встречу")
   @post
   @route("/bookings")
-  op createBooking(@body body: BookingInput): Booking;
+  op createBooking(@body body: BookingInput):
+    | Booking
+    | BadRequest
+    | NotFound
+    | Conflict;
 }
