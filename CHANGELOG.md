@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/zhigeruha7sk/ai-for-developers-project-386/compare/v1.1.0...v1.2.0) (2026-11-14)
+
+
+### Features
+
+* add Docker multi-stage build, Railway deployment config, and publish public URL ([a4156df](https://github.com/zhigeruha7sk/ai-for-developers-project-386/commit/a4156dfd7fb5e4f68ec64e92b343e5b46ccf69bf))
+
 ## [1.1.0](https://github.com/zhigeruha7sk/ai-for-developers-project-386/compare/v1.0.0...v1.1.0) (2026-11-14)
 
 
