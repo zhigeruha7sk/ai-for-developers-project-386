@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/zhigeruha7sk/ai-for-developers-project-386/compare/v1.0.0...v1.1.0) (2026-11-14)
+
+
+### Features
+
+* **api:** document problem detail error responses ([3020240](https://github.com/zhigeruha7sk/ai-for-developers-project-386/commit/3020240b90c6b135378b0e406cdc72279967fcdd))
+* contract errors and real-server browser E2E ([5b74c49](https://github.com/zhigeruha7sk/ai-for-developers-project-386/commit/5b74c49e18a2ea3d085a8c2cfd3f5d3f96c27b78))
+
 ## 1.0.0 (2026-11-13)
 
 
