@@ -146,6 +146,23 @@ class ApiContractTest {
         "Длительность встречи должна быть от 5 до 240 минут");
 
     assertProblemDetail(
+        post(
+            "/api/meeting-types",
+            "{\"name\":\"  \",\"description\":\"Проверка\",\"durationMinutes\":30}"),
+        400,
+        "Название типа встречи не должно быть пустым");
+
+    assertProblemDetail(
+        post(
+            "/api/meeting-types",
+            "{\"name\":\"Название\",\"description\":\"\",\"durationMinutes\":30}"),
+        400,
+        "Описание типа встречи не должно быть пустым");
+
+    assertProblemDetail(
+        post("/api/bookings", "{\"meetingTypeId\":"), 400, "Запрос не соответствует контракту API");
+
+    assertProblemDetail(
         get("/api/slots?meetingTypeId=meeting-30&date=not-a-date"),
         400,
         "Запрос не соответствует контракту API");
@@ -174,6 +191,13 @@ class ApiContractTest {
 
     assertProblemDetail(
         get("/api/slots?meetingTypeId=meeting-unknown&date=" + LocalDate.now(ZONE).plusDays(12)),
+        404,
+        "Тип встречи не найден");
+
+    assertProblemDetail(
+        put(
+            "/api/meeting-types/meeting-unknown",
+            "{\"name\":\"Название\",\"description\":\"Описание\",\"durationMinutes\":30}"),
         404,
         "Тип встречи не найден");
   }
