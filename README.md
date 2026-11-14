@@ -13,7 +13,7 @@
 - **Frontend:** React 19, Vite 8, TypeScript 6.
 - **Контракт:** TypeSpec 1.17 → OpenAPI 3 → TypeScript SDK (`@hey-api/openapi-ts`).
 - **Инструменты:** [mise](https://mise.jdx.dev) — версии Java, Maven, Node, hk и pitchfork.
-- **Проверки:** Spotless + google-java-format, ESLint + Prettier, JUnit.
+- **Проверки:** Spotless + google-java-format, ESLint + Prettier, JUnit, Vitest, Playwright.
 - **CI:** GitHub Actions.
 
 ## Установка
@@ -63,7 +63,8 @@ mise run dev:frontend
 
 ## Проверки
 
-Одна команда запускает линтеры, проверку типов и дымовой тест — локально и в GitHub Actions:
+Одна команда запускает линтеры, проверку типов, тесты бэкенда и фронтенда, а также браузерный
+E2E-сценарий против настоящего сервера — локально и в GitHub Actions:
 
 ```bash
 mise run check
