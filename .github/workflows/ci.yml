@@ -16,7 +16,7 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v7
 
@@ -24,6 +24,14 @@ jobs:
 
       - name: Install dependencies
         run: mise run install
+
+      - name: Install Playwright browsers
+        run: npm --prefix frontend exec playwright install --with-deps chromium
+
+      - name: Verify generated OpenAPI is up to date
+        run: |
+          mise run api:gen
+          git diff --exit-code -- api/openapi/openapi.yaml
 
       - name: Run checks
         run: mise run check
