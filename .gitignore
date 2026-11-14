@@ -13,6 +13,11 @@ mise.local.toml
 hk.local.pkl
 .vitest/
 
+# browser test artifacts
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/
+
 # agent skills (installed via skills CLI)
 .agents/
 skills-lock.json

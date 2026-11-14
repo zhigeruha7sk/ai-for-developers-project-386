@@ -26,6 +26,15 @@ public class BookingController {
 
   @PostMapping("/bookings")
   public Booking create(@RequestBody CreateBookingRequest request) {
+    if (request.meetingTypeId() == null || request.meetingTypeId().isBlank()) {
+      throw new IllegalArgumentException("Идентификатор типа встречи не должен быть пустым");
+    }
+    if (request.date() == null) {
+      throw new IllegalArgumentException("Дата встречи не должна быть пустой");
+    }
+    if (request.startTime() == null) {
+      throw new IllegalArgumentException("Время начала встречи не должно быть пустым");
+    }
     if (request.guestName() == null || request.guestName().isBlank()) {
       throw new IllegalArgumentException("Имя гостя не должно быть пустым");
     }

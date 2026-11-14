@@ -93,7 +93,7 @@ describe('админка', () => {
   it('при ответе 400 просит проверить поля', async () => {
     vi.mocked(apiCreateMeetingType).mockResolvedValue({
       data: undefined,
-      error: { message: 'bad request' },
+      error: { type: 'about:blank', title: 'Bad Request', status: 400, detail: 'bad request' },
       response: new Response(null, { status: 400 }),
     });
 
@@ -115,7 +115,7 @@ describe('админка', () => {
   it('при прочих ошибках сохранения показывает общее сообщение', async () => {
     vi.mocked(apiCreateMeetingType).mockResolvedValue({
       data: undefined,
-      error: { message: 'server error' },
+      error: { type: 'about:blank', title: 'Server Error', status: 500, detail: 'server error' },
       response: new Response(null, { status: 500 }),
     });
 

@@ -20,6 +20,7 @@ description = "Install every project dependency"
 run = [
   "npm --prefix api ci",
   "npm --prefix frontend ci",
+  "npm --prefix frontend exec playwright install chromium",
   "mvn -B -q -f backend/pom.xml dependency:go-offline",
 ]
 
@@ -66,9 +67,14 @@ description = "Run frontend tests"
 depends = ["sdk:gen"]
 run = "npm --prefix frontend run test"
 
+[tasks."test:e2e"]
+description = "Run the browser booking scenario against the real backend"
+depends = ["sdk:gen"]
+run = "npm --prefix frontend run test:e2e"
+
 [tasks.test]
 description = "Run every test suite"
-depends = ["backend:test", "frontend:test"]
+depends = ["backend:test", "frontend:test", "test:e2e"]
 
 [tasks.check]
 description = "Run every check used locally and in CI"

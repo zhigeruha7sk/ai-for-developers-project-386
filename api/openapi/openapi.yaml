@@ -29,6 +29,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Booking'
+        '400':
+          description: Ошибка валидации данных запроса.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: Запрошенный ресурс не найден.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '409':
+          description: Запрошенное время уже занято другой встречей.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
       requestBody:
         required: true
         content:
@@ -72,6 +90,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MeetingType'
+        '400':
+          description: Ошибка валидации данных запроса.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
       requestBody:
         required: true
         content:
@@ -95,6 +119,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MeetingType'
+        '400':
+          description: Ошибка валидации данных запроса.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: Запрошенный ресурс не найден.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
       requestBody:
         required: true
         content:
@@ -140,6 +176,18 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Slot'
+        '400':
+          description: Ошибка валидации данных запроса.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: Запрошенный ресурс не найден.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
 components:
   schemas:
     Booking:
@@ -268,6 +316,31 @@ components:
           format: int32
           description: Длительность встречи в минутах.
       description: Данные для создания или изменения типа встречи.
+    ProblemDetail:
+      type: object
+      required:
+        - type
+        - title
+        - status
+        - detail
+      properties:
+        type:
+          type: string
+          description: URI типа ошибки.
+        title:
+          type: string
+          description: Краткое описание ошибки.
+        status:
+          type: integer
+          format: int32
+          description: HTTP-статус ошибки.
+        detail:
+          type: string
+          description: Подробное описание ошибки.
+        instance:
+          type: string
+          description: URI запроса, в котором произошла ошибка.
+      description: Тело ошибки в формате RFC 7807.
     Slot:
       type: object
       required:

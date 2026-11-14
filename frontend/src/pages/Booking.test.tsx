@@ -101,7 +101,7 @@ describe('страница бронирования', () => {
   it('конфликт: занятый слот отклоняется с понятным сообщением гостю', async () => {
     vi.mocked(apiCreateBooking).mockResolvedValue({
       data: undefined,
-      error: { message: 'slot already booked' },
+      error: { type: 'about:blank', title: 'Conflict', status: 409, detail: 'slot already booked' },
       response: new Response(null, { status: 409 }),
     });
 
@@ -138,7 +138,7 @@ describe('страница бронирования', () => {
   it('ошибка 400 показывает гостю сообщение о дате и времени', async () => {
     vi.mocked(apiCreateBooking).mockResolvedValue({
       data: undefined,
-      error: { message: 'bad request' },
+      error: { type: 'about:blank', title: 'Bad Request', status: 400, detail: 'bad request' },
       response: new Response(null, { status: 400 }),
     });
 
@@ -209,7 +209,7 @@ describe('страница бронирования', () => {
   it('ошибка загрузки слотов показывает гостю понятный текст', async () => {
     vi.mocked(apiListSlots).mockResolvedValue({
       data: undefined,
-      error: { message: 'network down' },
+      error: { type: 'about:blank', title: 'Server Error', status: 500, detail: 'network down' },
     });
 
     renderBookingPage();

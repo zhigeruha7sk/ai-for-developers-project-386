@@ -26,7 +26,8 @@
 | `mise run check`                        | Все проверки: линтеры, типы, тесты                               |
 | `mise run lint`                         | Линтеры TypeSpec, Java (Spotless), фронтенда (ESLint + Prettier) |
 | `mise run typecheck`                    | Проверка типов фронтенда по сгенерированному SDK                 |
-| `mise run test`                         | Тесты бэкенда (JUnit) и фронтенда (Vitest)                       |
+| `mise run test`                         | Тесты бэкенда (JUnit), фронтенда (Vitest) и браузерный E2E       |
+| `mise run test:e2e`                     | Браузерный сценарий Playwright против настоящего сервера         |
 | `mise run api:gen`                      | Компилирует TypeSpec в OpenAPI                                   |
 | `mise run sdk:gen`                      | Генерирует TypeScript SDK из OpenAPI                             |
 | `mise run build`                        | Собирает бэкенд и фронтенд                                       |
@@ -41,6 +42,9 @@
 2. `mise run api:gen` обновляет `api/openapi/openapi.yaml`; файл коммитится.
 3. `mise run sdk:gen` обновляет `frontend/src/api/generated`; папка в `.gitignore`.
 4. Никогда не редактируйте сгенерированные файлы вручную — изменения потеряются.
+5. CI повторяет генерацию и падает, если `api/openapi/openapi.yaml` не совпадает с `api/main.tsp`.
+6. Фронтенд ходит в API только через сгенерированный SDK, а браузерный E2E работает против
+   настоящих backend и frontend без подмены ответов API.
 
 ## Формат коммитов
 
@@ -53,10 +57,13 @@
 - Типы: `feat`, `fix`, `chore`, `docs`, `test`, `refactor`, `ci`, `build`, `perf`.
 - Описание — в повелительном наклонении, без точки в конце, на английском.
 - Один коммит — одно логическое изменение.
-- Примеры: `feat(booking): add slot overlap validation`,
+- Каждый коммит реализации ссылается на тикет: добавьте `Refs #<номер>` в тело коммита.
+- Примеры: `feat(booking): add slot overlap validation` с `Refs #16`,
   `docs: describe local setup`, `ci: run mise check on push`.
 
-Автоматические релизы через release-please на этапе каркаса не настроены.
+Автоматические релизы ведёт release-please по Conventional Commits: на push в `main` он
+открывает или обновляет release PR, а после его merge создаёт git tag и GitHub Release. Конфигурация —
+`.github/workflows/release-please.yml`.
 
 ## Доменные правила
 

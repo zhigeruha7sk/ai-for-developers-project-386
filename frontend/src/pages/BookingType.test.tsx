@@ -57,7 +57,12 @@ describe('страница выбора типа события', () => {
     // Тип SDK делает data и error взаимоисключающими, но в рантайме возможны оба сразу.
     const degraded = {
       data: meetingTypes,
-      error: { message: 'degraded response' },
+      error: {
+        type: 'about:blank',
+        title: 'Server Error',
+        status: 500,
+        detail: 'degraded response',
+      },
     } as unknown as Awaited<ReturnType<typeof apiListMeetingTypes>>;
     vi.mocked(apiListMeetingTypes).mockResolvedValue(degraded);
 
@@ -68,7 +73,10 @@ describe('страница выбора типа события', () => {
 
   it('после ошибки кнопка «Попробовать снова» повторяет загрузку', async () => {
     vi.mocked(apiListMeetingTypes)
-      .mockResolvedValueOnce({ data: undefined, error: { message: 'network down' } })
+      .mockResolvedValueOnce({
+        data: undefined,
+        error: { type: 'about:blank', title: 'Server Error', status: 500, detail: 'network down' },
+      })
       .mockResolvedValueOnce({ data: meetingTypes, error: undefined });
 
     renderBookingTypePage();
