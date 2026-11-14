@@ -25,14 +25,15 @@ export default defineConfig({
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: [
     {
-      command: 'mvn -B -f backend/pom.xml spring-boot:run',
+      command: 'mise run dev:backend',
       cwd: '..',
       url: `${BACKEND_URL}/api/health`,
       reuseExistingServer: !process.env.CI,
       timeout: 180_000,
     },
     {
-      command: 'npm run dev -- --strictPort',
+      command: 'mise run dev:frontend',
+      cwd: '..',
       url: FRONTEND_URL,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,

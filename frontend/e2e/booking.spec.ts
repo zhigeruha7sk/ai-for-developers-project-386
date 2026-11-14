@@ -22,7 +22,7 @@ const MONTHS = [
 interface TargetDate {
   iso: string;
   day: number;
-  month: number;
+  monthIndex: number;
   year: number;
 }
 
@@ -36,7 +36,7 @@ function almatyDate(offsetDays: number): TargetDate {
     day: '2-digit',
   }).format(moment);
   const [year, month, day] = iso.split('-').map(Number);
-  return { iso, day, month: month - 1, year };
+  return { iso, day, monthIndex: month - 1, year };
 }
 
 async function openBooking(page: Page, typeId: string): Promise<void> {
@@ -51,12 +51,16 @@ async function selectDate(page: Page, date: TargetDate): Promise<void> {
     const [monthName, yearPart] = label.split(' ');
     const viewMonth = MONTHS.indexOf(monthName.toLowerCase());
     const viewYear = Number(yearPart);
-    const delta = (date.year - viewYear) * 12 + (date.month - viewMonth);
+    const delta = (date.year - viewYear) * 12 + (date.monthIndex - viewMonth);
     if (delta === 0) break;
     const navigation = delta > 0 ? 'Следующий месяц' : 'Предыдущий месяц';
     await page.getByRole('button', { name: navigation }).click();
     await expect(page.locator('.month-label')).not.toHaveText(label);
   }
+
+  await expect(page.locator('.month-label')).toHaveText(
+    `${MONTHS[date.monthIndex]} ${date.year} г.`,
+  );
 
   const slotsResponse = page.waitForResponse(
     (response) =>
