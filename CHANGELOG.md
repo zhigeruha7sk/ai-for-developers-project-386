@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.0](https://github.com/zhigeruha7sk/ai-for-developers-project-386/compare/v1.1.0...v1.2.0) (2026-11-20)
+
+
+### Features
+
+* add Docker multi-stage build, Railway deployment config, and publish public URL ([a4156df](https://github.com/zhigeruha7sk/ai-for-developers-project-386/commit/a4156dfd7fb5e4f68ec64e92b343e5b46ccf69bf))
+
+
+### Bug Fixes
+
+* **backend:** read server port from PORT env var ([98dff73](https://github.com/zhigeruha7sk/ai-for-developers-project-386/commit/98dff73c97aedcb27b81f69b7be80ad31336a2c2))
+* **backend:** read server port from PORT env var ([b7b8288](https://github.com/zhigeruha7sk/ai-for-developers-project-386/commit/b7b828803b6f2c5eefa9bac38a926393694cc35f)), closes [#20](https://github.com/zhigeruha7sk/ai-for-developers-project-386/issues/20)
+
 ## [1.1.0](https://github.com/zhigeruha7sk/ai-for-developers-project-386/compare/v1.0.0...v1.1.0) (2026-11-14)
 
 
