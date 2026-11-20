@@ -3,5 +3,6 @@ node_modules
 src/api/generated
 package-lock.json
 test-results
+test-results-backup
 playwright-report
 blob-report

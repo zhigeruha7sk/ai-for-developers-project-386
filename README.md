@@ -89,6 +89,18 @@ docker run --rm -e PORT=8080 -p 8080:8080 calendar
 используется `8080`. После запуска откройте <http://localhost:8080>, проверка сервиса —
 <http://localhost:8080/api/health>.
 
+Корректность чтения `PORT` проверяется запуском на нестандартном порту — приложение должно
+слушать именно его, а `8080` остаться закрытым:
+
+```bash
+docker build -t calendar .
+docker run --rm -e PORT=3210 -p 3210:3210 calendar
+curl -i http://localhost:3210/api/health   # HTTP/1.1 200
+curl -i http://localhost:8080/api/health   # connection refused
+```
+
+Эта же проверка выполняется в CI (джоба `docker-port`).
+
 ## Деплой
 
 Хостинг — [Railway](https://railway.com). Конфигурация лежит в `railway.json`: Railway собирает
